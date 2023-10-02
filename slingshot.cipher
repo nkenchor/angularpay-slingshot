@@ -1,0 +1,43 @@
+#!/bin/bash
+
+SERVICE_ACTION=$1
+SERVICE_NAME=$2
+SERVICE_TYPE=$3
+
+CONFIG_FILE_PATH="/angularpay/services/${SERVICE_NAME}/application.yml"
+
+if [ $SERVICE_TYPE == "java" ];
+then
+	if [ $SERVICE_ACTION == "enable" ];
+	then
+	        echo "Stopping $SERVICE_NAME ..."
+	        sudo systemctl stop "$SERVICE_NAME.service"
+
+        	echo "Enabling cipher for $SERVICE_NAME ..."
+	        sudo sed -i 's/enabled: false/enabled: true/' $CONFIG_FILE_PATH
+
+	        echo "Starting $SERVICE_NAME ..."
+	        sudo systemctl start "$SERVICE_NAME.service"
+	fi
+
+	if [ $SERVICE_ACTION == "disable" ];
+	then
+	        echo "Stopping $SERVICE_NAME ..."
+	        sudo systemctl stop "$SERVICE_NAME.service"
+
+        	echo "Disabling cipher for $SERVICE_NAME ..."
+	        sudo sed -i 's/enabled: true/enabled: false/' $CONFIG_FILE_PATH
+
+	        echo "Starting $SERVICE_NAME ..."
+	        sudo systemctl start "$SERVICE_NAME.service"
+	fi
+
+	if [ $SERVICE_ACTION == "status" ];
+	then
+        	sudo grep -i "enabled:" $CONFIG_FILE_PATH
+	fi
+fi
+
+
+
+

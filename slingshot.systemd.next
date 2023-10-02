@@ -1,0 +1,57 @@
+#!/bin/bash
+
+SERVICE_NAME=$1
+
+BASE_DIR="/angularpay/services"
+SERVICE_DIR="${BASE_DIR}/${SERVICE_NAME}"
+
+SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
+
+echo "Configuring $SERVICE_NAME ..."
+
+### create service file for java applications
+echo "Stopping service $SERVICE_NAME"
+sudo systemctl stop "$SERVICE_NAME.service"
+
+cd $SERVICE_DIR
+$SHELL
+
+echo "Installing dependencies..."
+sudo yarn install
+
+echo "Generating production build..."
+sudo yarn build
+
+if [ ! -f "$SERVICE_FILE" ];
+	then
+		echo "$SERVICE_FILE [java service file] does not exist. Creating it..."
+### Write into the service file ##
+echo '[Unit]
+Description='${SERVICE_NAME}' Service
+After=network.target
+[Service]
+WorkingDirectory='${SERVICE_DIR}'
+ExecStart=/usr/bin/yarn start
+Restart=always
+Type=simple
+User=root
+RestartSec=40
+StandardOutput=syslog
+StandardError=syslog
+[Install]
+WantedBy=multi-user.target' | sudo tee "$SERVICE_FILE"
+else
+	echo "$SERVICE_FILE [java service file] already exist. Moving on..."
+fi
+
+echo "Reloading daemon service ..."
+sudo systemctl daemon-reload
+
+echo "Enabling $SERVICE_NAME ..."
+sudo systemctl enable "$SERVICE_NAME.service"
+
+echo "Starting $SERVICE_NAME ..."
+sudo systemctl start "$SERVICE_NAME.service"
+
+
+

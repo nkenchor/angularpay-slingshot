@@ -1,0 +1,22 @@
+#!/bin/bash
+
+ACCESS_TOKEN_EXPIRY=$1
+REFRESH_TOKEN_EXPIRY=$2
+
+SERVICE_NAME=identity-service
+CONFIG_FILE_PATH="/angularpay/services/${SERVICE_NAME}/application.yml"
+
+echo "Stopping $SERVICE_NAME ..."
+sudo systemctl stop "$SERVICE_NAME.service"
+
+echo "Updating access token expiry seconds for $SERVICE_NAME ..."
+sudo sed -i "s/\defaultAccessTokenExpirySeconds.*/defaultAccessTokenExpirySeconds: $ACCESS_TOKEN_EXPIRY/" $CONFIG_FILE_PATH
+
+echo "Updating refresh token expiry seconds for $SERVICE_NAME ..."
+sudo sed -i "s/\defaultRefreshTokenExpirySeconds.*/defaultRefreshTokenExpirySeconds: $REFRESH_TOKEN_EXPIRY/" $CONFIG_FILE_PATH
+
+echo "Starting $SERVICE_NAME ..."
+sudo systemctl start "$SERVICE_NAME.service"
+
+
+

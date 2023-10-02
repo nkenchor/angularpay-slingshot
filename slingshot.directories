@@ -1,0 +1,52 @@
+#!/bin/bash
+
+SERVICE_NAME=$1
+SERVICE_TYPE=$2
+### AngularPay Service Directories ##
+BASE_DIR="/angularpay/services"
+SERVICE_DIR="${BASE_DIR}/${SERVICE_NAME}"
+NODEJS_BUILD_DIR="${SERVICE_DIR}/build"
+SERVICE_LOGS_DIR="${SERVICE_DIR}/logs"
+PM2_CONFIG_DIR="${SERVICE_DIR}/pm2/config"
+
+if [ ! -d "$BASE_DIR" ];
+then 
+	echo "$BASE_DIR does not exist! Creating it..."
+	mkdir -p "$BASE_DIR"
+else
+	echo "$BASE_DIR already exist. Moving on..."
+fi
+if [ ! -d "$SERVICE_DIR" ];
+then 
+	echo "$SERVICE_DIR does not exist! Creating it..."
+	mkdir -p "$SERVICE_DIR"
+else
+	echo "$SERVICE_DIR already exist. Moving on..."
+fi
+if [ "$SERVICE_TYPE" == "nodejs" -a ! -d "$NODEJS_BUILD_DIR" ];
+then
+	echo "$NODEJS_BUILD_DIR does not exist! Creating it..."
+	mkdir -p "$NODEJS_BUILD_DIR"
+else
+	if [ "$SERVICE_TYPE" == "nodejs" ];
+	then
+		echo "$NODEJS_BUILD_DIR already exist. Moving on..."
+	fi
+fi
+if [ ! -d "$SERVICE_LOGS_DIR" ];
+then 
+	echo "$SERVICE_LOGS_DIR does not exist! Creating it..."
+	mkdir -p "$SERVICE_LOGS_DIR"
+else
+	echo "$SERVICE_LOGS_DIR already exist. Moving on..."
+fi
+if [ "$SERVICE_TYPE" == "nodejs" -a ! -d "$PM2_CONFIG_DIR" ];
+then
+	echo "$PM2_CONFIG_DIR does not exist! Creating it..."
+	mkdir -p "$PM2_CONFIG_DIR"
+else
+	if [ "$SERVICE_TYPE" == "nodejs" ];
+	then
+		echo "$PM2_CONFIG_DIR already exist. Moving on..."
+	fi
+fi

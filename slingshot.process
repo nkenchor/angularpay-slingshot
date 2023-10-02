@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+ARG_ACTION=$1
+ARG_SERVICE_LIST_FILE=${2:-/home/dornu/angularpay.services.list}
+
+## validate action
+if [[ -z "$ARG_ACTION" || ( "$ARG_ACTION" != "start" && "$ARG_ACTION" != "stop" && "$ARG_ACTION" != "restart" ) ]];
+then
+	echo "-----------------------------------------------------------"
+	echo "Invalid action. Exiting..."
+	exit 1;
+fi
+
+## read services from file into an array
+IFS=$'\n' read -d '' -r -a services < $ARG_SERVICE_LIST_FILE
+
+echo "-----------------------------------------------------------"
+printf '%s\n' "${services[@]}"
+
+## now loop through the above array of services
+for i in "${services[@]}"
+do
+    SERVICE_NAME_TYPE_ARR=(${i//./ })
+    SERVICE_NAME=${SERVICE_NAME_TYPE_ARR[0]}
+    SERVICE_TYPE=${SERVICE_NAME_TYPE_ARR[1]}
+	
+    if [[ -z "$SERVICE_TYPE" || "$SERVICE_TYPE" == "undefined" || ( "$SERVICE_TYPE" != "java" && "$SERVICE_TYPE" != "nodejs" ) ]];
+    then
+	    echo "-----------------------------------------------------------"
+	    echo "Skipping undefined or unrecognized service type for $i"
+	    continue
+    fi
+
+    ### start|stop|restart java applications
+    if [ $SERVICE_TYPE == "java" ];
+    then
+	    echo "-----------------------------------------------------------"
+	    echo "$ARG_ACTION $SERVICE_NAME initiated..."
+	    sudo systemctl "$ARG_ACTION" "$SERVICE_NAME.service"
+	    echo "$ARG_ACTION $SERVICE_NAME completed successfully!"
+    fi
+    ### TODO: define nodejs process management
+
+done
+
+echo "-----------------------------------------------------------"
+echo "ALL DONE!!!"
+echo "-----------------------------------------------------------"
+

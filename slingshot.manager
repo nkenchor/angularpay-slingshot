@@ -1,0 +1,13 @@
+#!/bin/bash
+
+SERVICE_ACTION=$1
+SERVICE_NAME=$2
+SERVICE_TYPE=$3
+
+if [ $SERVICE_TYPE == "java" ];
+then
+	echo "Executing $SERVICE_ACTION $SERVICE_NAME ..."
+	sudo systemctl "$SERVICE_ACTION" "$SERVICE_NAME.service"
+	### TODO: implement manager for nodejs and Go
+fi
+

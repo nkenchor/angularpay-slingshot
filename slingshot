@@ -1,0 +1,56 @@
+#!/bin/bash
+
+while [[ "$#" -gt 0 ]]; do
+	case $1 in
+		-b|--battlefield) ENVIRONMENT="${2:-dev}"; shift ;;
+		-c|--clean-slate) REINSTALL=1 ;;
+		-f|--five-smooth-stones) SERVICE_LIST_FILE="$2"; shift ;;
+		-r|--battle-ready) LIVE_CONFIGURATION=1 ;;
+		-s|--strategize) MKDIR_ONLY=1 ;;
+		-t|--training-camp) TEST_RUN_DIR="${2:-/tmp}"; shift ;;
+		*) echo "Who is this uncircumcised Philistine: $1 ???"; exit 1 ;;
+	esac
+	shift
+done
+
+if [[ -z "$MKDIR_ONLY" && ( -z "$ENVIRONMENT" || -z "$SERVICE_LIST_FILE" ) ]];
+then
+	echo "Really??? Which battlefield are you headed and where are your stones???"
+else
+	echo "-----------------------------------------------------------"
+	echo "Setting up $ENVIRONMENT environment for services listed here: $SERVICE_LIST_FILE"
+
+	if [ -z "$REINSTALL" ]
+	then
+		DO_REINSTALL=0
+	else
+		DO_REINSTALL=1
+	fi
+
+	if [ -z "$MKDIR_ONLY" ]
+	then
+		DO_MKDIR_ONLY=0
+	else
+		DO_MKDIR_ONLY=1
+	fi
+
+	if [ -z "$TEST_RUN_DIR" ]
+	then
+		TEST_RUN_DIR="/tmp"
+	fi
+
+	if [ -z "$LIVE_CONFIGURATION" ]
+	then
+		TEST_RUN_CONFIGURATION=1
+	else
+		TEST_RUN_CONFIGURATION=0
+	fi
+
+	if [ "$TEST_RUN_CONFIGURATION" -eq 1 ]; 
+	then
+		echo "Executing in test run mode. Configuration files will be written to this location: $TEST_RUN_DIR"
+	fi
+	slingshot.setup $ENVIRONMENT $SERVICE_LIST_FILE $TEST_RUN_CONFIGURATION $TEST_RUN_DIR $DO_REINSTALL $DO_MKDIR_ONLY
+fi
+
+
